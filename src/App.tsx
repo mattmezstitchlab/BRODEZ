@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import Embroidery3D from './Embroidery3D';
 import { Download, Upload, WandSparkles, Grid3X3, Box, Palette, Undo2, Redo2, ZoomIn, ZoomOut, RotateCcw, Save, FileJson, Image as ImageIcon, SlidersHorizontal, Sparkles, ChevronRight, MousePointer2, Crosshair, Eye, Layers3, CircleHelp } from 'lucide-react';
 
 type Dmc={code:string,name:string,hex:string};
@@ -109,7 +110,7 @@ function App(){
    </aside>
    <main className="stage">
     <div className="stage-head"><div><span className="eyebrow">MOTIF / SOURCE DE VÉRITÉ</span><h1>{pattern.name}</h1><p>{pattern.width} × {pattern.height} points · {count.toLocaleString('fr-FR')} croix · {colors.length} fils</p></div><div className="view-switch">{[['2d','2D',Grid3X3],['3d','3D',Box],['chart','PATRON',Crosshair],['threads','FILS',Palette]].map(([id,label,Icon])=><button key={id as string} className={view===id?'active':''} onClick={()=>setView(id as any)}><Icon/><span>{label as string}</span></button>)}</div></div>
-    <div className={'canvas-wrap '+view} style={{'--zoom':zoom} as React.CSSProperties}><div className="canvas-card"><canvas ref={canvasRef} onClick={clickCanvas}/><div className="canvas-corners"><span>01</span><span>{pattern.width}</span><span>{pattern.height}</span></div></div></div>
+    <div className={'canvas-wrap '+view} style={{'--zoom':zoom} as React.CSSProperties}><div className="canvas-card">{view==='3d'?<Embroidery3D width={pattern.width} height={pattern.height} zoom={zoom} stitches={pattern.stitches.map((s,i)=>({color:s.color>=0?DMC[s.color].hex:'#00000000',x:i%pattern.width,y:Math.floor(i/pattern.width),type:s.type==='half'?'half':'cross'})).filter(s=>s.color!=='#00000000')}/>:<canvas ref={canvasRef} onClick={clickCanvas}/>}<div className="canvas-corners"><span>01</span><span>{pattern.width}</span><span>{pattern.height}</span></div></div></div>
     <div className="stage-foot"><div className="legend"><span className="live"/><b>ÉDITABLE</b><span>Cliquez une case pour ajouter / retirer un point</span></div><div className="zoom"><button onClick={()=>setZoom(z=>clamp(+(z-.1).toFixed(2),.7,1.4))}><ZoomOut/></button><span>{Math.round(zoom*100)}%</span><button onClick={()=>setZoom(z=>clamp(+(z+.1).toFixed(2),.7,1.4))}><ZoomIn/></button><button onClick={()=>setZoom(1)}><RotateCcw/></button></div></div>
    </main>
    <aside className="right">
